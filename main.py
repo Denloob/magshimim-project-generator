@@ -8,7 +8,7 @@ from shutil import copyfile
 from utils import ask_yes_no_question
 
 PROJECT_PROGRAM_NAME = "prog.c"
-SOURCE_FILE_EXTENTIONS = ".c"
+SOURCE_FILE_EXTENSIONS = ".c"
 SCRIPT_PATH = os.path.realpath(__file__)
 SCRIPT_DIR_PATH = os.path.dirname(SCRIPT_PATH)
 TEMPLATES_DIR_PATH = os.path.join(SCRIPT_DIR_PATH, "templates/")
@@ -26,7 +26,7 @@ def get_filenames(path: str) -> List[str]:
     """Returns a list of .c file names in the given directory."""
     filenames = []
     for filename in os.listdir(path):
-        if filename.endswith(SOURCE_FILE_EXTENTIONS):
+        if filename.endswith(SOURCE_FILE_EXTENSIONS):
             filenames.append(filename)
     return filenames
 
@@ -40,7 +40,7 @@ def main(source_dir: str, output_dir: str, solution_name: str):
     # Get a list of .c files in the source directory
     filenames = get_filenames(source_dir)
     print(
-        f"Found {len(filenames)} {SOURCE_FILE_EXTENTIONS} files in {source_dir}."
+        f"Found {len(filenames)} {SOURCE_FILE_EXTENSIONS} files in {source_dir}."
     )
 
     # Ask the user which files to include in the build
