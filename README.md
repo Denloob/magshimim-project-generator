@@ -25,6 +25,11 @@ python main.py /home/Magshimim/week1/ /home/Magshimim/week1/final_answer/ week1
 ```
 This will create a VisualStudio solution with the name week1 in the directory `final_answer/`
 
+## TODO
+- [ ] Refactor/Beautify the code
+- [ ] Add more project generation functionality
+- [ ] Package the project in an easier to distribute way
+
 ## Contributing
 
 Any help is appreciated!
