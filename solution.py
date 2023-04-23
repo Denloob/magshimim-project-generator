@@ -114,7 +114,9 @@ def generate_sln(
 
 
 def main():
-    sln, projects, sln_guid = generate_sln(["q1.c", "q2.c", "q3.c"], lambda x: x.upper().replace(".c", ""))
+    sln, projects, sln_guid = generate_sln(
+        ["q1.c", "q2.c", "q3.c"], lambda x: x.upper().replace(".c", "")
+    )
     print(sln)
 
 
