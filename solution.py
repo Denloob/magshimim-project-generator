@@ -6,7 +6,7 @@ WARNING: a lot of hardcoded stuff, please forgive me, at least I documented this
 NamingNotationConventions:
 ---
 Every global _SLN var with _TEMPLATE suffix has some variable to replace for
- exaple all occurrences of $NAME should be replaced with project name.
+ example all occurrences of $NAME should be replaced with project name.
 
 Global _SLN variables explained:
 ----
