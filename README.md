@@ -28,3 +28,9 @@ This will create a VisualStudio solution with the name week1 in the directory `f
 ## Contributing
 
 Any help is appreciated!
+
+## License
+
+This project is licensed under the **GNU General Public License v3**.
+
+See [LICENSE](LICENSE) for more information.
