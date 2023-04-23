@@ -70,7 +70,8 @@ EndGlobal
 
 
 def generate_sln(
-    filenames: Iterable[str], filename_modifier: Callable[[str], str]
+    filenames: Iterable[str],
+    filename_modifier: Callable[[str], str] = lambda x: x,
 ) -> tuple[str, Dict[str, uuid.UUID], uuid.UUID]:
     """
     Generates a VisualStudio sln file for the given filenames.
