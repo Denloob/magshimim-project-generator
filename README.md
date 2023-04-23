@@ -24,3 +24,7 @@ You can run
 python main.py /home/Magshimim/week1/ /home/Magshimim/week1/final_answer/ week1
 ```
 This will create a VisualStudio solution with the name week1 in the directory `final_answer/`
+
+## Contributing
+
+Any help is appreciated!
