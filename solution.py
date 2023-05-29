@@ -1,7 +1,7 @@
 """
 Visual Studio Solution Generator; With love by den@denloob.tk
 
-WARNING: a lot of hardcoded stuff, please forgive me, at least I documented this shit :D
+WARNING: a lot of hardcoded stuff, please forgive me, at least I documented this stuff :D
 
 NamingNotationConventions:
 ---
