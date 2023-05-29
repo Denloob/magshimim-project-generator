@@ -68,6 +68,15 @@ _SLN_GLOBAL_END_TEMPLATE = """\
 EndGlobal
 """
 
+def filenames_to_uuids(filenames: Iterable[str]) -> Dict[str, uuid.UUID]:
+    """
+    Generates a dictionary of filename:UUID from the given filenames.
+
+    @param filenames list of file names for which to generate the dictionary.
+    @return a dictionary of filename:UUID.
+    """
+
+    return {filename: uuid.uuid4() for filename in filenames}
 
 def generate_sln(
     filenames: Iterable[str],
@@ -86,10 +95,7 @@ def generate_sln(
     @todo maybe instead of .replace use something better than just text juggling.
     """
 
-    # TODO: move this to a function that converts filenames to Dict[str, uuid.UUID]
-    projects: Dict[str, uuid.UUID] = {}
-    for filename in filenames:
-        projects[filename_modifier(filename)] = uuid.uuid4()
+    projects = filenames_to_uuids(map(filename_modifier, filenames))
 
     solution = _SLN_HEADER
     solution_guid = uuid.uuid4()
