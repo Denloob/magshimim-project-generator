@@ -63,7 +63,7 @@ def main(source_dir: str, output_dir: str, solution_name: str):
 
     # Generate the solution file using solution.generate_sln
     sln_str, projects, _ = solution.generate_sln(
-        map(remove_extension, selected_filenames), filename_modifier
+        map(filename_modifier, map(remove_extension, selected_filenames))
     )
     print("Generated solution file.")
 

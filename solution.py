@@ -80,7 +80,6 @@ def filenames_to_uuids(filenames: Iterable[str]) -> Dict[str, uuid.UUID]:
 
 def generate_sln(
     filenames: Iterable[str],
-    filename_modifier: Callable[[str], str] = lambda x: x,
 ) -> tuple[str, Dict[str, uuid.UUID], uuid.UUID]:
     """
     Generates a VisualStudio sln file for the given filenames.
@@ -95,7 +94,7 @@ def generate_sln(
     @todo maybe instead of .replace use something better than just text juggling.
     """
 
-    projects = filenames_to_uuids(map(filename_modifier, filenames))
+    projects = filenames_to_uuids(filenames)
 
     solution = _SLN_HEADER
     solution_guid = uuid.uuid4()
@@ -122,7 +121,7 @@ def generate_sln(
 def main():
     print("Example sln generation for the files q1.c q2.c q3.c and the functions upper() and replace('.c', ''):")
     sln, projects, sln_guid = generate_sln(
-        ["q1.c", "q2.c", "q3.c"], lambda x: x.replace(".c", "").upper()
+        filename.replace(".c", "").upper() for filename in ["q1.c", "q2.c", "q3.c"]
     )
     print(f"{projects=}")
     print(f"{sln_guid=}")
