@@ -116,7 +116,7 @@ def generate_sln(
 def main():
     print("Example sln generation for the files q1.c q2.c q3.c and the functions upper() and replace('.c', ''):")
     sln, projects, sln_guid = generate_sln(
-        ["q1.c", "q2.c", "q3.c"], lambda x: x.upper().replace(".c", "")
+        ["q1.c", "q2.c", "q3.c"], lambda x: x.replace(".c", "").upper()
     )
     print(f"{projects=}")
     print(f"{sln_guid=}")
