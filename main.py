@@ -32,7 +32,7 @@ def get_filenames(path: str) -> List[str]:
 
 
 def remove_extension(filename: str) -> str:
-    """Removes the .c extension from the filename."""
+    """Removes the source file extension (.c, .cpp, ...) from the filename."""
     return os.path.splitext(filename)[0]
 
 
