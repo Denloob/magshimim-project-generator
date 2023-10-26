@@ -15,8 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="prog.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    $FILTER_ITEMS
   </ItemGroup>
 </Project>

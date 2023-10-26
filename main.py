@@ -36,6 +36,37 @@ def remove_extension(filename: str) -> str:
     return os.path.splitext(filename)[0]
 
 
+def to_items(files: List[str]) -> str:
+    """Converts a list of files, into ClCompile items for .vcxproj"""
+    convert = lambda file: f'<ClCompile Include="{file}" />'
+    return "\n".join(map(convert, files))
+
+
+def to_filter_items(
+    sources: List[str] = [], headers: List[str] = [], resources: List[str] = []
+) -> str:
+    """Converts a list of sources, headers and resources into ClCompile with filter for .vcxproj.filter"""
+
+    convert = (
+        lambda file, filter_type: f"""<ClCompile Include="{file}">
+      <Filter>{filter_type}</Filter>
+    </ClCompile>"""
+    )
+
+    convert_files = lambda files, filter_type: "\n".join(
+        convert(file, filter_type) for file in files
+    )
+
+    return "\n".join(
+        convert_files(files, filter_type)
+        for files, filter_type in [
+            (sources, "Source Files"),
+            (headers, "Header Files"),
+            (resources, "Resource Files"),
+        ]
+    )
+
+
 def main(source_dir: str, output_dir: str, solution_name: str):
     # Get a list of .c files in the source directory
     filenames = get_filenames(source_dir)
@@ -87,7 +118,14 @@ def main(source_dir: str, output_dir: str, solution_name: str):
         )
         os.mkdir(project_path)
         copyfile(file_path, prog_path)
-        copyfile(VCXPROJ_FILTERS_TEMPLATE_PATH, project_vcxproj_filter_path)
+        with open(VCXPROJ_FILTERS_TEMPLATE_PATH, "r") as template, open(
+            project_vcxproj_filter_path, "w"
+        ) as f:
+            f.write(
+                template.read().replace(
+                    "$FILTER_ITEMS", to_filter_items([PROJECT_PROGRAM_NAME])
+                )
+            )
         with open(VCXPROJ_TEMPLATE_PATH, "r") as template, open(
             project_vcxproj_path, "w"
         ) as f:
@@ -95,6 +133,7 @@ def main(source_dir: str, output_dir: str, solution_name: str):
                 template.read()
                 .replace("$GUID", str(project_guid))
                 .replace("$NAME", project_name)
+                .replace("$ITEMS", to_items([PROJECT_PROGRAM_NAME]))
             )
 
         print(f"Project {project_name} built.")
