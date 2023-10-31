@@ -34,7 +34,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 
 # The hardcoded GUID (8BC9CE...C942) is project type GUID (Magshimim_EX)
 _SLN_PROJECT_TEMPLATE = """\
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "$NAME", "$NAME\\$NAME.vcxproj", "{$GUID}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "$NAME", "$NAME.vcxproj", "{$GUID}"
 EndProject
 """
 _SLN_GLOBAL_HEADER = """\
@@ -79,43 +79,40 @@ def filenames_to_uuids(filenames: Iterable[str]) -> Dict[str, uuid.UUID]:
     return {filename: uuid.uuid4() for filename in filenames}
 
 def generate_sln(
-    filenames: Iterable[str],
-) -> tuple[str, Dict[str, uuid.UUID], uuid.UUID]:
+    solution_name
+) -> tuple[str, uuid.UUID, uuid.UUID]:
     """
-    Generates a VisualStudio sln file for the given filenames.
-    For each file, creates a unique uuid/guid which is also used
-      in the .sln
+    Generates a VisualStudio sln file for a project in the same dir as the sln.
 
-    @param filenames list of file names for which to generate the sln.
+    @param solution_name the name of the whole solution. This will be the name of the project.
     @return the generated sln file as a string,
-           a dictionary of filename:GUID,
+           project GUID,
            and solution GUID.
 
     @todo maybe instead of .replace use something better than just text juggling.
     """
 
-    projects = filenames_to_uuids(filenames)
+    project_name = solution_name
+    project_guid = uuid.uuid4()
 
     solution = _SLN_HEADER
     solution_guid = uuid.uuid4()
 
-    for project_name, project_guid in projects.items():
-        solution += _SLN_PROJECT_TEMPLATE.replace(
-            "$NAME", project_name
-        ).replace("$GUID", str(project_guid))
+    solution += _SLN_PROJECT_TEMPLATE.replace(
+        "$NAME", project_name
+    ).replace("$GUID", str(project_guid))
 
     solution += _SLN_GLOBAL_HEADER
 
-    for project_name, project_guid in projects.items():
-        solution += _SLN_GLOBAL_PROJECT_CONFIG_TEMPLATE.replace(
-            "$GUID", str(project_guid)
-        )
+    solution += _SLN_GLOBAL_PROJECT_CONFIG_TEMPLATE.replace(
+        "$GUID", str(project_guid)
+    )
 
     solution += _SLN_GLOBAL_END_TEMPLATE.replace(
         "$SOLUTION_GUID", str(solution_guid)
     )
 
-    return (solution, projects, solution_guid)
+    return (solution, project_guid, solution_guid)
 
 
 def main():

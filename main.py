@@ -3,12 +3,10 @@
 import os
 import sys
 import solution
-from typing import List
+from typing import List, Tuple
 from shutil import copyfile
 from utils import ask_yes_no_question
 
-PROJECT_PROGRAM_NAME = "prog.c"
-SOURCE_FILE_EXTENSIONS = ".c"
 SCRIPT_PATH = os.path.realpath(__file__)
 SCRIPT_DIR_PATH = os.path.dirname(SCRIPT_PATH)
 TEMPLATES_DIR_PATH = os.path.join(SCRIPT_DIR_PATH, "templates/")
@@ -22,11 +20,58 @@ VCXPROJ_FILTERS_TEMPLATE_PATH = os.path.join(
 )
 
 
+SOURCE_EXTENSIONS = [
+    "cpp",
+    "c",
+    "cc",
+    "cxx",
+    "def",
+    "odl",
+    "idl",
+    "hpj",
+    "bat",
+    "asm",
+    "asmx",
+]
+HEADER_EXTENSIONS = [
+    "h",
+    "hh",
+    "hpp",
+    "hxx",
+    "hm",
+    "inl",
+    "inc",
+    "ipp",
+    "xsd",
+]
+RESOURCE_EXTENSIONS = [
+    "rc",
+    "ico",
+    "cur",
+    "bmp",
+    "dlg",
+    "rc2",
+    "rct",
+    "bin",
+    "rgs",
+    "gif",
+    "jpg",
+    "jpeg",
+    "jpe",
+    "resx",
+    "tiff",
+    "tif",
+    "png",
+    "wav",
+    "mfcribbon-ms",
+]
+
+
 def get_filenames(path: str) -> List[str]:
-    """Returns a list of .c file names in the given directory."""
+    """Returns a list of supported filenames in the given directory."""
     filenames = []
     for filename in os.listdir(path):
-        if filename.endswith(SOURCE_FILE_EXTENSIONS):
+        if any(filename.endswith(extension) for extension in SOURCE_EXTENSIONS + HEADER_EXTENSIONS + RESOURCE_EXTENSIONS):
             filenames.append(filename)
     return filenames
 
@@ -67,11 +112,39 @@ def to_filter_items(
     )
 
 
+def split_filenames_by_their_type(
+    filenames: List[str],
+) -> Tuple[List[str], List[str], List[str]]:
+    """Splits filenames by their extension into a tuple of (sources, headers, resources)"""
+
+    check_type = lambda extensions, filename: any(
+        filename.endswith(extension) for extension in extensions
+    )
+
+    sources = [
+        filename
+        for filename in filenames
+        if check_type(SOURCE_EXTENSIONS, filename)
+    ]
+    headers = [
+        filename
+        for filename in filenames
+        if check_type(HEADER_EXTENSIONS, filename)
+    ]
+    resources = [
+        filename
+        for filename in filenames
+        if check_type(RESOURCE_EXTENSIONS, filename)
+    ]
+
+    return (sources, headers, resources)
+
+
 def main(source_dir: str, output_dir: str, solution_name: str):
     # Get a list of .c files in the source directory
     filenames = get_filenames(source_dir)
     print(
-        f"Found {len(filenames)} {SOURCE_FILE_EXTENSIONS} files in {source_dir}."
+        f"Found {len(filenames)} files in {source_dir}."
     )
 
     # Ask the user which files to include in the build
@@ -84,18 +157,10 @@ def main(source_dir: str, output_dir: str, solution_name: str):
     ]
     print(f"Selected {len(selected_filenames)} files for the build.")
 
-    filename_modifier = (
-        str.capitalize
-        if ask_yes_no_question(
-            "Should the project names be Capitalized?", default_answer=True
-        )
-        else lambda x: x
-    )
-
     # Generate the solution file using solution.generate_sln
-    sln_str, projects, _ = solution.generate_sln(
-        map(filename_modifier, map(remove_extension, selected_filenames))
-    )
+    sln_str, project_guid, _ = solution.generate_sln(solution_name)
+    project_name = solution_name
+
     print("Generated solution file.")
 
     # Write the solution file to the output directory
@@ -104,39 +169,39 @@ def main(source_dir: str, output_dir: str, solution_name: str):
         f.write(sln_str)
     print(f"Wrote solution file to {output_path}.")
 
-    for (project_name, project_guid), filename in zip(
-        projects.items(), selected_filenames
-    ):
-        file_path = os.path.join(source_dir, filename)
-        project_path = os.path.join(output_dir, project_name)
-        prog_path = os.path.join(project_path, PROJECT_PROGRAM_NAME)
-        project_vcxproj_path = os.path.join(
-            project_path, project_name + VCXPROJ_EXT
-        )
-        project_vcxproj_filter_path = os.path.join(
-            project_path, project_name + VCXPROJ_FILTER_EXT
-        )
-        os.mkdir(project_path)
-        copyfile(file_path, prog_path)
-        with open(VCXPROJ_FILTERS_TEMPLATE_PATH, "r") as template, open(
-            project_vcxproj_filter_path, "w"
-        ) as f:
-            f.write(
-                template.read().replace(
-                    "$FILTER_ITEMS", to_filter_items([PROJECT_PROGRAM_NAME])
-                )
-            )
-        with open(VCXPROJ_TEMPLATE_PATH, "r") as template, open(
-            project_vcxproj_path, "w"
-        ) as f:
-            f.write(
-                template.read()
-                .replace("$GUID", str(project_guid))
-                .replace("$NAME", project_name)
-                .replace("$ITEMS", to_items([PROJECT_PROGRAM_NAME]))
-            )
+    project_vcxproj_path = os.path.join(output_dir, project_name + VCXPROJ_EXT)
 
-        print(f"Project {project_name} built.")
+    project_vcxproj_filter_path = os.path.join(
+        output_dir, project_name + VCXPROJ_FILTER_EXT
+    )
+
+    for filename in selected_filenames:
+        file_path = os.path.join(source_dir, filename)
+        prog_path = os.path.join(output_dir, filename)
+        copyfile(file_path, prog_path)
+
+    sources, headers, resources = split_filenames_by_their_type(
+        selected_filenames
+    )
+
+    with open(VCXPROJ_FILTERS_TEMPLATE_PATH, "r") as template, open(
+        project_vcxproj_filter_path, "w"
+    ) as f:
+        f.write(
+            template.read().replace(
+                "$FILTER_ITEMS",
+                to_filter_items(sources, headers, resources),
+            )
+        )
+    with open(VCXPROJ_TEMPLATE_PATH, "r") as template, open(
+        project_vcxproj_path, "w"
+    ) as f:
+        f.write(
+            template.read()
+            .replace("$GUID", str(project_guid))
+            .replace("$NAME", project_name)
+            .replace("$ITEMS", to_items(sources + headers + resources))
+        )
 
     print("Done!")
 

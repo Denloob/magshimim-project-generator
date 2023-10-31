@@ -13,17 +13,17 @@ python main.py source_dir output_dir solution_name
 Say you have
 ```sh
 /home/Magshimim/week1/
-- q1.c
-- q2.c
-- q3.c
+- Stack.cpp
+- Stack.h
+- main.cpp
 - final_answer/
 ```
 
 You can run
 ```sh
-python main.py /home/Magshimim/week1/ /home/Magshimim/week1/final_answer/ week1
+python main.py /home/Magshimim/week1/ /home/Magshimim/week1/final_answer/ DataStructures
 ```
-This will create a VisualStudio solution with the name week1 in the directory `final_answer/`
+This will create a VisualStudio solution with the name DataStructures in the directory `final_answer/`
 
 ## TODO
 - [ ] Refactor/Beautify the code
