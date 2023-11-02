@@ -60,7 +60,7 @@ Shortened Usage:
 
 Flags:
     -h    Show this help message
-    -y    Accept all files in the 
+    -y    Accept all files
 
 Examples:
     Shortened Usage:
