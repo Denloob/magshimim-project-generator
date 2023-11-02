@@ -72,14 +72,14 @@ HELP_FLAG = 'h'
 
 MAIN_PY = 'main.py'
 BASIC_USAGE_MESSAGE = "Basic Usage:\n    python %s <source_dir> <output_dir> <solution_name>"
-SHORT_USAGE_MESSAGE = "Shortened Usage:\n    python %s <source_directory>"
+SHORT_USAGE_MESSAGE = "Shortened Usage:\n    python %s <source_dir>"
 HELP_MESSAGE = f'''
 Visual Studio Project Generator
 
 {BASIC_USAGE_MESSAGE % MAIN_PY}
 {SHORT_USAGE_MESSAGE % MAIN_PY}
 
-*Note*: In Shortened Usage, source_dir = output_dir, and the .sln file name is the same as the source_directory name.
+*Note*: In Shortened Usage, source_dir = output_dir, and the .sln file name is the <source_dir> name.
 
 Flags:
     -h    Show this help message
