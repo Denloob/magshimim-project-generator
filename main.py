@@ -19,7 +19,6 @@ VCXPROJ_FILTERS_TEMPLATE_PATH = os.path.join(
     TEMPLATES_DIR_PATH, "template" + VCXPROJ_FILTER_EXT
 )
 
-
 SOURCE_EXTENSIONS = [
     "cpp",
     "c",
@@ -66,6 +65,30 @@ RESOURCE_EXTENSIONS = [
     "mfcribbon-ms",
 ]
 
+FLAG_PREFIX = '-'
+FLAG_LEN = 1
+ACCEPT_ALL_FLAG = 'y'
+HELP_FLAG = 'h'
+
+MAIN_PY = 'main.py'
+BASIC_USAGE_MESSAGE = "Basic Usage:\n    python %s <source_dir> <output_dir> <solution_name>"
+SHORT_USAGE_MESSAGE = "Shortened Usage:\n    python %s <source_directory>"
+HELP_MESSAGE = f'''
+Visual Studio Project Generator
+
+{BASIC_USAGE_MESSAGE % MAIN_PY}
+{SHORT_USAGE_MESSAGE % MAIN_PY}
+
+*Note*: In Shortened Usage, source_dir = output_dir, and the .sln file name is the same as the source_directory name.
+
+Flags:
+    -h    Show this help message
+    -y    Accept all files in the 
+
+Examples:
+    Shortened Usage:
+        python main.py DataStructures
+'''
 
 def get_filenames(path: str) -> List[str]:
     """Returns a list of supported filenames in the given directory."""
@@ -140,21 +163,21 @@ def split_filenames_by_their_type(
     return (sources, headers, resources)
 
 
-def main(source_dir: str, output_dir: str, solution_name: str):
+def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
     # Get a list of .c files in the source directory
     filenames = get_filenames(source_dir)
     print(
         f"Found {len(filenames)} files in {source_dir}."
     )
 
-    # Ask the user which files to include in the build
-    selected_filenames = [
-        filename
-        for filename in filenames
-        if ask_yes_no_question(
-            f"Include {filename} in the build?", default_answer=True
-        )
-    ]
+    # Select files
+    # Accept All flag or Ask the user which files to include in the build
+    selected_filenames = []
+    for filename in filenames:
+        if (ACCEPT_ALL_FLAG in flags or
+                ask_yes_no_question(f"Include {filename} in the build?", default_answer=True)):
+            selected_filenames.append(filename)
+
     print(f"Selected {len(selected_filenames)} files for the build.")
 
     # Generate the solution file using solution.generate_sln
@@ -208,21 +231,34 @@ def main(source_dir: str, output_dir: str, solution_name: str):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
+    # Get flags
+    flags = [i for i in sys.argv if FLAG_PREFIX in i and len(i) == len(FLAG_PREFIX) + FLAG_LEN]
+
+    # Remove flags from argv
+    argv = list(filter(lambda i: i not in flags, sys.argv))
+    # Remove FLAG_PREFIX from flags
+    flags = list(map(lambda i: i.replace(FLAG_PREFIX, ''), flags))
+
+    # Show help message if HELP_FLAG
+    if (HELP_FLAG in flags):
+        print(HELP_MESSAGE)
+        sys.exit(0)
+
+    if len(argv) == 2:
         # shortened version
-        if (os.path.exists(sys.argv[1])):
-            name = sys.argv[1]
-            main(name, name, name)
-            sys.exit(0)
+        if (os.path.exists(argv[1])):
+            source_dir = argv[1]
+            output_dir = argv[1]
+            solution_name = argv[1]
+    else:
+        if len(argv) != 4:
+            print(
+                HELP_MESSAGE
+            )
+            sys.exit(1)
 
-    if len(sys.argv) != 4:
-        print(
-            f"Usage: python {sys.argv[0]} source_dir output_dir solution_name"
-        )
-        sys.exit(1)
+        source_dir = argv[1]
+        output_dir = argv[2]
+        solution_name = argv[3]
 
-    source_dir = sys.argv[1]
-    output_dir = sys.argv[2]
-    solution_name = sys.argv[3]
-
-    main(source_dir, output_dir, solution_name)
+    main(source_dir, output_dir, solution_name, flags)
