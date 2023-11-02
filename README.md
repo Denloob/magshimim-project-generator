@@ -7,7 +7,7 @@ into VisualStudio Solutions and Projects.
 
 ### Basic usage: 
 ```sh
-python main.py source_dir output_dir solution_name
+python main.py <source_dir> <output_dir> <solution_name>
 ```
 
 Say you have
@@ -24,6 +24,50 @@ You can run
 python main.py /home/Magshimim/week1/ /home/Magshimim/week1/final_answer/ DataStructures
 ```
 This will create a VisualStudio solution with the name DataStructures in the directory `final_answer/`
+
+<br>
+
+### Shortened usage:
+```sh
+python main.py <source_dir>
+```
+
+Say you have
+```sh
+/home/Magshimim/week1/
+- /DataStructures
+  - Stack.cpp
+  - Stack.h
+  - main.cpp
+```
+You can run
+```bash
+python main.py DataStructures
+```
+This will create a VisualStudio solution with the name DataStructures in the directory `DataStructures/`
+
+<br>
+
+```bash
+Visual Studio Project Generator
+
+Basic Usage:
+    python main.py <source_dir> <output_dir> <solution_name>
+Shortened Usage:
+    python main.py <source_dir>
+
+*Note*: In Shortened Usage, source_dir = output_dir, and the .sln file name is the <source_dir> name.
+
+Flags:
+    -h    Show this help message
+    -y    Accept all files in the 
+
+Examples:
+    Shortened Usage:
+        python main.py DataStructures
+```
+
+<br><br>
 
 ## TODO
 - [ ] Refactor/Beautify the code
