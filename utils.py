@@ -1,5 +1,16 @@
 from typing import Optional
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def ask_yes_no_question(
     prompt: str, *, default_answer: Optional[bool] = None
 ) -> bool:
@@ -37,7 +48,7 @@ def ask_yes_no_question(
 
     displayed_choice = POSSIBLE_DISPLAYED_CHOICES[default_answer]
 
-    full_prompt = f"{prompt} {displayed_choice} "
+    full_prompt = f"{prompt} {bcolors.BOLD}[{displayed_choice}]{bcolors.ENDC} "
 
     while True:
         user_answer = input(full_prompt).lower().strip()
