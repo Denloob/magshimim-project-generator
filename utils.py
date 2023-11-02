@@ -37,7 +37,7 @@ def ask_yes_no_question(
 
     displayed_choice = POSSIBLE_DISPLAYED_CHOICES[default_answer]
 
-    full_prompt = f"{prompt} {displayed_choice} "
+    full_prompt = f"{prompt} [{displayed_choice}] "
 
     while True:
         user_answer = input(full_prompt).lower().strip()
