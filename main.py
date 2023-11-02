@@ -175,10 +175,11 @@ def main(source_dir: str, output_dir: str, solution_name: str):
         output_dir, project_name + VCXPROJ_FILTER_EXT
     )
 
-    for filename in selected_filenames:
-        file_path = os.path.join(source_dir, filename)
-        prog_path = os.path.join(output_dir, filename)
-        copyfile(file_path, prog_path)
+    if (source_dir != output_dir):
+        for filename in selected_filenames:
+            file_path = os.path.join(source_dir, filename)
+            prog_path = os.path.join(output_dir, filename)
+            copyfile(file_path, prog_path)
 
     sources, headers, resources = split_filenames_by_their_type(
         selected_filenames
@@ -207,6 +208,13 @@ def main(source_dir: str, output_dir: str, solution_name: str):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        # shortened version
+        if (os.path.exists(sys.argv[1])):
+            name = sys.argv[1]
+            main(name, name, name)
+            sys.exit(0)
+
     if len(sys.argv) != 4:
         print(
             f"Usage: python {sys.argv[0]} source_dir output_dir solution_name"
