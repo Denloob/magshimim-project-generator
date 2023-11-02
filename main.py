@@ -250,6 +250,10 @@ if __name__ == "__main__":
             source_dir = argv[1]
             output_dir = argv[1]
             solution_name = argv[1]
+        else:
+            print(f"The directory {argv[1]} doesn't exist.")
+            print(HELP_MESSAGE)
+            sys.exit(1)
     else:
         if len(argv) != 4:
             print(
