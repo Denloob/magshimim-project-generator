@@ -90,6 +90,17 @@ Examples:
         python main.py DataStructures
 '''
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def get_filenames(path: str) -> List[str]:
     """Returns a list of supported filenames in the given directory."""
     filenames = []
@@ -167,7 +178,7 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
     # Get a list of .c files in the source directory
     filenames = get_filenames(source_dir)
     print(
-        f"Found {len(filenames)} files in {source_dir}."
+        f"Found {bcolors.BOLD}{bcolors.OKCYAN}{len(filenames)}{bcolors.ENDC}{bcolors.ENDC} files in {bcolors.BOLD}{bcolors.OKCYAN}{source_dir}{bcolors.ENDC}{bcolors.ENDC}."
     )
 
     # Select files
@@ -175,10 +186,10 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
     selected_filenames = []
     for filename in filenames:
         if (ACCEPT_ALL_FLAG in flags or
-                ask_yes_no_question(f"Include {filename} in the build?", default_answer=True)):
+                ask_yes_no_question(f"Include {bcolors.BOLD}{bcolors.OKCYAN}{filename}{bcolors.ENDC}{bcolors.ENDC} in the build?", default_answer=True)):
             selected_filenames.append(filename)
 
-    print(f"Selected {len(selected_filenames)} files for the build.")
+    print(f"Selected {bcolors.BOLD}{bcolors.OKCYAN}{len(selected_filenames)}{bcolors.ENDC}{bcolors.ENDC} files for the build.")
 
     # Generate the solution file using solution.generate_sln
     sln_str, project_guid, _ = solution.generate_sln(solution_name)
@@ -190,7 +201,7 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
     output_path = os.path.join(output_dir, f"{solution_name}.sln")
     with open(output_path, "w") as f:
         f.write(sln_str)
-    print(f"Wrote solution file to {output_path}.")
+    print(f"Wrote solution file to {bcolors.BOLD}{bcolors.OKCYAN}{output_path}{bcolors.ENDC}{bcolors.ENDC}.")
 
     project_vcxproj_path = os.path.join(output_dir, project_name + VCXPROJ_EXT)
 
@@ -227,7 +238,7 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
             .replace("$ITEMS", to_items(sources + headers + resources))
         )
 
-    print("Done!")
+    print(f"{bcolors.OKGREEN}Done!{bcolors.ENDC}")
 
 
 if __name__ == "__main__":
@@ -243,6 +254,8 @@ if __name__ == "__main__":
     if (HELP_FLAG in flags):
         print(HELP_MESSAGE)
         sys.exit(0)
+
+    print(f"{bcolors.BOLD}{bcolors.WARNING}Visual Studio Project Generator\n{bcolors.ENDC}{bcolors.ENDC}")
 
     if len(argv) == 2:
         # shortened version
