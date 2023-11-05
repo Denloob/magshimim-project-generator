@@ -74,7 +74,8 @@ MAIN_PY = 'main.py'
 BASIC_USAGE_MESSAGE = "Basic Usage:\n    python %s <source_dir> <output_dir> <solution_name>"
 SHORT_USAGE_MESSAGE = "Shortened Usage:\n    python %s <source_dir>"
 HELP_MESSAGE = f'''
-Visual Studio Project Generator
+{bcolors.BOLD}{bcolors.WARNING}Visual Studio Project Generator{bcolors.ENDC}{bcolors.ENDC}
+
 
 {BASIC_USAGE_MESSAGE % MAIN_PY}
 {SHORT_USAGE_MESSAGE % MAIN_PY}
@@ -254,8 +255,6 @@ if __name__ == "__main__":
     if (HELP_FLAG in flags):
         print(HELP_MESSAGE)
         sys.exit(0)
-
-    print(f"{bcolors.BOLD}{bcolors.WARNING}Visual Studio Project Generator\n{bcolors.ENDC}{bcolors.ENDC}")
 
     if len(argv) == 2:
         # shortened version
