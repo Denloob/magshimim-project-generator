@@ -114,34 +114,44 @@ def remove_extension(filename: str) -> str:
     """Removes the source file extension (.c, .cpp, ...) from the filename."""
     return os.path.splitext(filename)[0]
 
-
-def to_items(files: List[str]) -> str:
-    """Converts a list of files, into ClCompile items for .vcxproj"""
-    convert = lambda file: f'<ClCompile Include="{file}" />'
+def to_items(files: List[str], item_type: str) -> str:
+    """Converts a list of files, into `item_type` items for .vcxproj"""
+    convert = lambda file: f'<{item_type} Include="{file}" />'
     return "\n".join(map(convert, files))
+
+def to_compile_items(files: List[str]) -> str:
+    """Converts a list of files, into ClCompile items for .vcxproj"""
+    return to_items(files, "ClCompile")
+
+def to_include_items(files: List[str]) -> str:
+    """Converts a list of files, into ClInclude items for .vcxproj"""
+    return to_items(files, "ClInclude")
 
 
 def to_filter_items(
     sources: List[str] = [], headers: List[str] = [], resources: List[str] = []
 ) -> str:
-    """Converts a list of sources, headers and resources into ClCompile with filter for .vcxproj.filter"""
+    """Converts a list of sources, headers and resources into ClCompile and ClInclude with filter for .vcxproj.filter"""
+
+    if resources:
+      raise NotImplementedError("Resources are not yet supported")
 
     convert = (
-        lambda file, filter_type: f"""<ClCompile Include="{file}">
+        lambda file, filter_type, include_type: f"""<{include_type} Include="{file}">
       <Filter>{filter_type}</Filter>
-    </ClCompile>"""
+    </{include_type}>"""
     )
 
-    convert_files = lambda files, filter_type: "\n".join(
-        convert(file, filter_type) for file in files
+    convert_files = lambda files, filter_type, include_type: "\n".join(
+        convert(file, filter_type, include_type) for file in files
     )
 
     return "\n".join(
-        convert_files(files, filter_type)
-        for files, filter_type in [
-            (sources, "Source Files"),
-            (headers, "Header Files"),
-            (resources, "Resource Files"),
+        convert_files(files, filter_type, include_type)
+        for files, filter_type, include_type in [
+            (sources, "Source Files", "ClCompile"),
+            (headers, "Header Files", "ClInclude"),
+            (resources, "Resource Files", ""), # Not implemented
         ]
     )
 
@@ -235,7 +245,8 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
             template.read()
             .replace("$GUID", str(project_guid))
             .replace("$NAME", project_name)
-            .replace("$ITEMS", to_items(sources + headers + resources))
+            .replace("$COMPILE_ITEMS", to_compile_items(sources))
+            .replace("$INCLUDE_ITEMS", to_include_items(headers))
         )
 
     print(f"{bcolors.OKGREEN}Done!{bcolors.ENDC}")

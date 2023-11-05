@@ -138,7 +138,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    $ITEMS
+    $COMPILE_ITEMS
+  </ItemGroup>
+  <ItemGroup>
+    $INCLUDE_ITEMS
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
