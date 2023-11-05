@@ -5,7 +5,7 @@ import sys
 import solution
 from typing import List, Tuple
 from shutil import copyfile
-from utils import ask_yes_no_question
+from utils import ask_yes_no_question, bcolors
 
 SCRIPT_PATH = os.path.realpath(__file__)
 SCRIPT_DIR_PATH = os.path.dirname(SCRIPT_PATH)
@@ -89,17 +89,6 @@ Examples:
     Shortened Usage:
         python main.py DataStructures
 '''
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 def get_filenames(path: str) -> List[str]:
     """Returns a list of supported filenames in the given directory."""
