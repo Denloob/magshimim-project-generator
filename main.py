@@ -6,6 +6,7 @@ import solution
 from typing import List, Tuple
 from shutil import copyfile
 from utils import ask_yes_no_question, bcolors
+from pathlib import Path
 
 SCRIPT_PATH = os.path.realpath(__file__)
 SCRIPT_DIR_PATH = os.path.dirname(SCRIPT_PATH)
@@ -199,6 +200,12 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
 
     # Write the solution file to the output directory
     output_path = os.path.join(output_dir, f"{solution_name}.sln")
+
+    if not os.path.exists(output_dir):
+        dir_path = Path(output_dir)
+        dir_path.mkdir(parents=True) # create the directory if it doesn't exists (same for parent directories)
+        print(f"Created output directory {bcolors.BOLD}{bcolors.OKCYAN}{output_dir}{bcolors.ENDC}{bcolors.ENDC}.")
+
     with open(output_path, "w") as f:
         f.write(sln_str)
     print(f"Wrote solution file to {bcolors.BOLD}{bcolors.OKCYAN}{output_path}{bcolors.ENDC}{bcolors.ENDC}.")
