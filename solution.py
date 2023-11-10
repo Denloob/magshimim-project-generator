@@ -21,7 +21,7 @@ _SLN_GLOBAL_END_TEMPLATE - the footer of the whole SLN file
     $SOLUTION_GUID - GUID for this solution
 """
 
-from typing import Iterable, Dict, Callable
+from typing import Iterable, Dict, Tuple
 import uuid
 
 
@@ -80,7 +80,7 @@ def filenames_to_uuids(filenames: Iterable[str]) -> Dict[str, uuid.UUID]:
 
 def generate_sln(
     solution_name
-) -> tuple[str, uuid.UUID, uuid.UUID]:
+) -> Tuple[str, uuid.UUID, uuid.UUID]:
     """
     Generates a VisualStudio sln file for a project in the same dir as the sln.
 
