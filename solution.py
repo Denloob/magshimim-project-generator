@@ -21,7 +21,9 @@ _SLN_GLOBAL_END_TEMPLATE - the footer of the whole SLN file
     $SOLUTION_GUID - GUID for this solution
 """
 
-from typing import Iterable, Dict, Tuple
+from typing import Iterable, Dict, Tuple, Union, Optional
+import re
+import os
 import uuid
 
 
@@ -68,6 +70,7 @@ _SLN_GLOBAL_END_TEMPLATE = """\
 EndGlobal
 """
 
+
 def filenames_to_uuids(filenames: Iterable[str]) -> Dict[str, uuid.UUID]:
     """
     Generates a dictionary of filename:UUID from the given filenames.
@@ -78,9 +81,49 @@ def filenames_to_uuids(filenames: Iterable[str]) -> Dict[str, uuid.UUID]:
 
     return {filename: uuid.uuid4() for filename in filenames}
 
-def generate_sln(
-    solution_name
-) -> Tuple[str, uuid.UUID, uuid.UUID]:
+
+def load_sln(
+    solution_path: Union[str, os.PathLike]
+) -> Optional[Tuple[str, uuid.UUID, uuid.UUID]]:
+    """
+    Loads an existing VisualStudio sln file that contains one project in the
+        same dir.
+
+    @param solution_path Path to the sln file to load.
+    @return If the solution is valid, a tuple of
+            ( the contents of the loaded sln file,
+              the existing project GUID,
+              the existing solution GUID)
+            Else None.
+
+    @see generate_sln
+    """
+
+    with open(solution_path, "r") as f:
+        solution = f.read()
+
+    GUID_REGEX = r"\{[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}\}"
+
+    PROJECT_GUID_REGEX = re.compile(
+        r'Project\("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"\) = "[^"]+", "[^"]+", "('
+        + GUID_REGEX
+        + r')"'
+    )
+    SOLUTION_GUID_REGEX = re.compile(r"SolutionGuid = (" + GUID_REGEX + ")")
+
+    project_guid_match = PROJECT_GUID_REGEX.search(solution)
+    solution_guid_match = SOLUTION_GUID_REGEX.search(solution)
+
+    if project_guid_match is None or solution_guid_match is None:
+        return None
+
+    project_guid = uuid.UUID(project_guid_match.group(1))
+    solution_guid = uuid.UUID(solution_guid_match.group(1))
+
+    return solution, project_guid, solution_guid
+
+
+def generate_sln(solution_name) -> Tuple[str, uuid.UUID, uuid.UUID]:
     """
     Generates a VisualStudio sln file for a project in the same dir as the sln.
 
@@ -98,9 +141,9 @@ def generate_sln(
     solution = _SLN_HEADER
     solution_guid = uuid.uuid4()
 
-    solution += _SLN_PROJECT_TEMPLATE.replace(
-        "$NAME", project_name
-    ).replace("$GUID", str(project_guid))
+    solution += _SLN_PROJECT_TEMPLATE.replace("$NAME", project_name).replace(
+        "$GUID", str(project_guid)
+    )
 
     solution += _SLN_GLOBAL_HEADER
 
@@ -116,9 +159,12 @@ def generate_sln(
 
 
 def main():
-    print("Example sln generation for the files q1.c q2.c q3.c and the functions upper() and replace('.c', ''):")
+    print(
+        "Example sln generation for the files q1.c q2.c q3.c and the functions upper() and replace('.c', ''):"
+    )
     sln, projects, sln_guid = generate_sln(
-        filename.replace(".c", "").upper() for filename in ["q1.c", "q2.c", "q3.c"]
+        filename.replace(".c", "").upper()
+        for filename in ["q1.c", "q2.c", "q3.c"]
     )
     print(f"{projects=}")
     print(f"{sln_guid=}")
