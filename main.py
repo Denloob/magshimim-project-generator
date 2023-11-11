@@ -274,8 +274,8 @@ if __name__ == "__main__":
 
     if len(argv) == 2:
         # shortened version
-        if not Path(argv[1]).exists:
             usage()
+        if not Path(argv[1]).exists():
         source_dir = argv[1]
         output_dir = argv[1]
         solution_name = argv[1]
