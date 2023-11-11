@@ -3,20 +3,18 @@
 import os
 import sys
 import solution
-from typing import List, NoReturn, Optional, Tuple, TextIO
+from typing import List, NoReturn, Optional, Tuple, TextIO, Union
 from shutil import copyfile
 from utils import ask_yes_no_question, bcolors
 from pathlib import Path
 
-SCRIPT_PATH = os.path.realpath(__file__)
-SCRIPT_DIR_PATH = os.path.dirname(SCRIPT_PATH)
-TEMPLATES_DIR_PATH = os.path.join(SCRIPT_DIR_PATH, "templates/")
+TEMPLATES_DIR_PATH = Path(__file__).parent / "templates"
+
 VCXPROJ_EXT = ".vcxproj"
 VCXPROJ_FILTER_EXT = VCXPROJ_EXT + ".filters"
-VCXPROJ_TEMPLATE_PATH = os.path.join(
-    TEMPLATES_DIR_PATH, "template" + VCXPROJ_EXT
-)
-VCXPROJ_FILTERS_TEMPLATE_PATH = os.path.join(
+
+VCXPROJ_TEMPLATE_PATH = Path(TEMPLATES_DIR_PATH, "template" + VCXPROJ_EXT)
+VCXPROJ_FILTERS_TEMPLATE_PATH = Path(
     TEMPLATES_DIR_PATH, "template" + VCXPROJ_FILTER_EXT
 )
 
@@ -94,7 +92,7 @@ Examples:
         python main.py DataStructures
 '''
 
-def get_filenames(path: str) -> List[str]:
+def get_filenames(path: Union[str, os.PathLike]) -> List[str]:
     """Returns a list of supported filenames in the given directory."""
     filenames = []
     for filename in os.listdir(path):
@@ -177,7 +175,7 @@ def split_filenames_by_their_type(
     return (sources, headers, resources)
 
 
-def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
+def main(source_dir: Path, output_dir: Path, solution_name: str, flags: list):
     # Get a list of .c files in the source directory
     filenames = get_filenames(source_dir)
     print(
@@ -194,7 +192,7 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
 
     print(f"Selected {bcolors.BOLD}{bcolors.OKCYAN}{len(selected_filenames)}{bcolors.ENDC}{bcolors.ENDC} files for the build.")
 
-    solution_path = os.path.join(output_dir, f"{solution_name}.sln")
+    solution_path = output_dir / f"{solution_name}.sln"
 
     if UPDATE_FLAG in flags:
         # Load an existing solution from path
@@ -211,50 +209,38 @@ def main(source_dir: str, output_dir: str, solution_name: str, flags: list):
 
     project_name = solution_name
 
-    if not os.path.exists(output_dir):
-        dir_path = Path(output_dir)
-        dir_path.mkdir(parents=True) # create the directory if it doesn't exists (same for parent directories)
+    if not output_dir.exists():
+        output_dir.mkdir(parents=True) # create the directory if it doesn't exists (same for parent directories)
         print(f"Created output directory {bcolors.BOLD}{bcolors.OKCYAN}{output_dir}{bcolors.ENDC}{bcolors.ENDC}.")
 
-    with open(solution_path, "w") as f:
-        f.write(sln_str)
+    solution_path.write_text(sln_str)
     print(f"Wrote solution file to {bcolors.BOLD}{bcolors.OKCYAN}{solution_path}{bcolors.ENDC}{bcolors.ENDC}.")
 
-    project_vcxproj_path = os.path.join(output_dir, project_name + VCXPROJ_EXT)
+    project_vcxproj_path = output_dir / (project_name + VCXPROJ_EXT)
 
-    project_vcxproj_filter_path = os.path.join(
-        output_dir, project_name + VCXPROJ_FILTER_EXT
-    )
+    project_vcxproj_filter_path = output_dir / (project_name + VCXPROJ_FILTER_EXT)
 
-    if (source_dir != output_dir):
+    if not source_dir.samefile(output_dir):
         for filename in selected_filenames:
-            file_path = os.path.join(source_dir, filename)
-            prog_path = os.path.join(output_dir, filename)
-            copyfile(file_path, prog_path)
+            copyfile(source_dir / filename, output_dir)
 
     sources, headers, resources = split_filenames_by_their_type(
         selected_filenames
     )
 
-    with open(VCXPROJ_FILTERS_TEMPLATE_PATH, "r") as template, open(
-        project_vcxproj_filter_path, "w"
-    ) as f:
-        f.write(
-            template.read().replace(
-                "$FILTER_ITEMS",
-                to_filter_items(sources, headers, resources),
-            )
+    project_vcxproj_filter_path.write_text(
+        VCXPROJ_FILTERS_TEMPLATE_PATH.read_text().replace(
+            "$FILTER_ITEMS", to_filter_items(sources, headers, resources)
         )
-    with open(VCXPROJ_TEMPLATE_PATH, "r") as template, open(
-        project_vcxproj_path, "w"
-    ) as f:
-        f.write(
-            template.read()
-            .replace("$GUID", str(project_guid))
-            .replace("$NAME", project_name)
-            .replace("$COMPILE_ITEMS", to_compile_items(sources))
-            .replace("$INCLUDE_ITEMS", to_include_items(headers))
-        )
+    )
+
+    project_vcxproj_path.write_text(
+        VCXPROJ_TEMPLATE_PATH.read_text()
+        .replace("$GUID", str(project_guid))
+        .replace("$NAME", project_name)
+        .replace("$COMPILE_ITEMS", to_compile_items(sources))
+        .replace("$INCLUDE_ITEMS", to_include_items(headers))
+    )
 
     print(f"{bcolors.OKGREEN}Done!{bcolors.ENDC}")
 
@@ -288,7 +274,7 @@ if __name__ == "__main__":
 
     if len(argv) == 2:
         # shortened version
-        if not os.path.exists(argv[1]):
+        if not Path(argv[1]).exists:
             usage()
         source_dir = argv[1]
         output_dir = argv[1]
@@ -300,4 +286,4 @@ if __name__ == "__main__":
     else:
         usage()
 
-    main(source_dir, output_dir, solution_name, flags)
+    main(Path(source_dir), Path(output_dir), solution_name, flags)
