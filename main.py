@@ -222,7 +222,7 @@ def main(source_dir: Path, output_dir: Path, solution_name: str, flags: list):
 
     if not source_dir.samefile(output_dir):
         for filename in selected_filenames:
-            copyfile(source_dir / filename, output_dir)
+            copyfile(source_dir / filename, output_dir / filename)
 
     sources, headers, resources = split_filenames_by_their_type(
         selected_filenames
