@@ -71,6 +71,8 @@ HELP_FLAG = 'h'
 UPDATE_FLAG = 'u'
 
 MAIN_PY = 'main.py'
+USAGE_MESSAGE = f"usage: python {MAIN_PY} <source_dir> [(<dest_dir> <solution_name>)] [-h -y -u]"
+
 BASIC_USAGE_MESSAGE = "Basic Usage:\n    python %s <source_dir> <output_dir> <solution_name>"
 SHORT_USAGE_MESSAGE = "Shortened Usage:\n    python %s <source_dir>"
 HELP_MESSAGE = f'''
@@ -244,6 +246,14 @@ def main(source_dir: Path, output_dir: Path, solution_name: str, flags: list):
 
     print(f"{bcolors.OKGREEN}Done!{bcolors.ENDC}")
 
+def help(
+    *,
+    return_code: int = 0,
+    file: TextIO = sys.stdout,
+) -> NoReturn:
+    print(HELP_MESSAGE, file=file)
+    sys.exit(return_code)
+
 
 def usage(
     *,
@@ -254,7 +264,7 @@ def usage(
     if message is not None:
         print(message, file=file, end="\n\n")
 
-    print(HELP_MESSAGE, file=file)
+    print(USAGE_MESSAGE, file=file)
 
     sys.exit(return_code)
 
@@ -270,7 +280,7 @@ if __name__ == "__main__":
 
     # Show help message if HELP_FLAG
     if (HELP_FLAG in flags):
-        usage(return_code=0, file=sys.stdout)
+        help()
 
     if len(argv) == 2:
         # shortened version
@@ -282,7 +292,7 @@ if __name__ == "__main__":
         output_dir = argv[2]
         solution_name = argv[3]
     else:
-        usage()
+        help(return_code=1, file=sys.stderr)
 
     if not Path(source_dir).exists():
         usage(message=f"Directory {source_dir} must exist.")
