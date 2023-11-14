@@ -61,7 +61,7 @@ Shortened Usage:
 Flags:
     -h    Show this help message
     -y    Accept all files
-    -u    Update an existing project
+    -o    Overwrite project if already exists
 
 Examples:
     Shortened Usage:
