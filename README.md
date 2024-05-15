@@ -3,6 +3,9 @@
 Set of util scripts for creating Magshimim Exercises (Homework questions)
 into VisualStudio Solutions and Projects.
 
+> [!NOTE]
+> This version was tailored for the C++ course. You might be interested in the [C course version](https://github.com/Denloob/magshimim-project-generator/releases/tag/1.0.0).
+
 ## Quick Start
 
 ### Basic usage: 
