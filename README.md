@@ -68,13 +68,6 @@ Examples:
         python main.py DataStructures
 ```
 
-<br><br>
-
-## TODO
-- [ ] Refactor/Beautify the code
-- [ ] Add more project generation functionality
-- [ ] Package the project in an easier to distribute way
-
 ## Contributing
 
 Any help is appreciated!
