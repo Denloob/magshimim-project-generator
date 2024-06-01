@@ -1,5 +1,5 @@
 """
-Visual Studio Solution Generator; With love by den@denloob.tk
+Visual Studio Solution Generator; With love by den@denloob.uk
 
 WARNING: a lot of hardcoded stuff, please forgive me, at least I documented it :D
 
