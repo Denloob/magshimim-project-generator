@@ -64,6 +64,7 @@ Shortened Usage:
 Flags:
     -h    Show this help message
     -y    Accept all files
+    -r    Recursively add source files within subdirs
     -o    Overwrite project if already exists
 
 Examples:
