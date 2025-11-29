@@ -102,7 +102,7 @@ def get_filepaths(base_path: Union[str, os.PathLike], flags: list) -> List[str]:
     """Returns a list of supported filenames in the given directory."""
     is_src_file = lambda extension: extension in SOURCE_EXTENSIONS + HEADER_EXTENSIONS + RESOURCE_EXTENSIONS
 
-    strip_start = lambda _path: _path.removeprefix(str(base_path)).removeprefix('/')
+    strip_start = lambda _path: _path.removeprefix(str(base_path)).removeprefix('/').removeprefix('\\')
     def add_files_in_dir(path: Union[str, os.PathLike], recursive: bool) -> List[str]:
         """Adds all source file paths to local filepaths"""
         filepaths = []
@@ -112,6 +112,7 @@ def get_filepaths(base_path: Union[str, os.PathLike], flags: list) -> List[str]:
 
             if os.path.isdir(full_path) and recursive:
                 dir = strip_start(full_path)
+                if dir.startswith('.'): continue
 
                 if ACCEPT_ALL_FLAG in flags or \
                         ask_yes_no_question(f"Include subdir {bcolors.BOLD}{bcolors.OKCYAN}{dir}{bcolors.ENDC}{bcolors.ENDC} in the build?", default_answer=True):
